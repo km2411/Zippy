@@ -3,7 +3,7 @@ import factory.CompressorDecompressorFactory;
 import interfaces.FileCompressorDecompressor;
 
 public class Zippy {
-    static final CompressorDecompressorFactory factory = new CompressorDecompressorFactory();
+    private static final CompressorDecompressorFactory factory = new CompressorDecompressorFactory();
 
     public static void main(String[] args) {
         // utility to display usage and parse-format args

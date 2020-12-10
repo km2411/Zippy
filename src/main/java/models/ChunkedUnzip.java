@@ -26,9 +26,8 @@ public class ChunkedUnzip {
     }
 
     public void unzipAll() throws IOException {
-        // handle the case of ending or not ending with '/'
         try {
-            fos = new FileOutputStream(destDir + filename);
+            fos = new FileOutputStream(destDir + "/" + filename);
             for (String file : partFiles) {
                 unzipSingleFile(file);
             }
@@ -41,7 +40,7 @@ public class ChunkedUnzip {
 
     private void unzipSingleFile(String partFile) {
         try {
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + partFile));
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + "/" + partFile));
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 int length;

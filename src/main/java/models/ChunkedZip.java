@@ -1,5 +1,6 @@
 package models;
 
+import enums.ZipFormatType;
 import utils.ZippyUtils;
 
 import java.io.File;
@@ -20,6 +21,8 @@ public class ChunkedZip {
     private FileInputStream fis;
     private ZipOutputStream currZipOutStream;
     private int currPartIndex;
+
+    private static final String FILE_EXTENSION = ZipFormatType.ZIP.getExtension();
 
     public ChunkedZip(String filename, String sourceDir, String destDir, long maxFileSize) {
         this.filename = filename;
@@ -64,7 +67,7 @@ public class ChunkedZip {
     private String getFilePartName() {
         currPartIndex += 1;
         StringBuilder nameBuilder = new StringBuilder(filename).append(ZippyUtils.PART_POSTFIX)
-                .append(currPartIndex).append(ZippyUtils.FILE_EXTENSION);
+                .append(currPartIndex).append(FILE_EXTENSION);
         return nameBuilder.toString();
     }
 }
