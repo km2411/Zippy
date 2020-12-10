@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ChunkedUnzip {
+public class ChunkedUnzip implements Runnable{
 
     private String filename;
     private String sourceDir;
@@ -25,9 +25,18 @@ public class ChunkedUnzip {
         this.partFiles = partFiles;
     }
 
-    public void unzipAll() throws IOException {
+    @Override
+    public void run() {
         try {
-            fos = new FileOutputStream(destDir + "/" + filename);
+            unzipAll();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void unzipAll() throws IOException {
+        try {
+            fos = new FileOutputStream(destDir + ZippyUtils.DELIM + filename);
             for (String file : partFiles) {
                 unzipSingleFile(file);
             }
@@ -40,7 +49,7 @@ public class ChunkedUnzip {
 
     private void unzipSingleFile(String partFile) {
         try {
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + "/" + partFile));
+            ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile));
             ZipEntry zipEntry = zis.getNextEntry();
             while (zipEntry != null) {
                 int length;

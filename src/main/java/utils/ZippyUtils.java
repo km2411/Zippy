@@ -15,6 +15,7 @@ public class ZippyUtils {
 
     public static final int BUFFER_SIZE = 1024;
     public static final String PART_POSTFIX = ".part.";
+    public static final String DELIM = "/";
 
     public static Map<String, List<String>> getAllFilesInDir(String sourceDir) {
         Map<String, List<String>> pathToFileList = Maps.newHashMap();
@@ -44,7 +45,6 @@ public class ZippyUtils {
         for (Map.Entry<String, List<String>> filesAtPath : allFilesInDir.entrySet()) {
             allZippedWithParts.put(filesAtPath.getKey(), getZippedPartFiles(filesAtPath.getValue(), extension));
         }
-
         return allZippedWithParts;
     }
 

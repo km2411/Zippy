@@ -8,54 +8,64 @@ import models.ChunkedUnzip;
 import models.ChunkedZip;
 import utils.ZippyUtils;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 public class FileCompressorDecompressorZipImpl implements FileCompressorDecompressor {
 
-    private long maxFileSize;
+    private final long maxFileSize;
+    private final ExecutorService executor;
 
     public FileCompressorDecompressorZipImpl(long maxFileSize) {
         this.maxFileSize = maxFileSize;
+        this.executor = Executors.newFixedThreadPool(4);
+
     }
 
     @Override
     public void zip(String sourceDir, String destinationDir) {
+        long start = System.currentTimeMillis();
         Map<String, List<String>> pathToFileList = ZippyUtils.getAllFilesInDir(sourceDir);
-        // submit tasks to executor later
         for (Map.Entry<String, List<String>> entry : pathToFileList.entrySet()) {
             String relativePath = entry.getKey();
             for (String file : entry.getValue()) {
-                try {
-                    ZippyUtils.createOutDirsIfMissing(destinationDir + relativePath);
-                    ChunkedZip zipper = new ChunkedZip(file, sourceDir + relativePath,
-                                        destinationDir + relativePath, maxFileSize);
-                    zipper.createZip();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ZippyUtils.createOutDirsIfMissing(destinationDir + relativePath);
+                executor.execute(new ChunkedZip(file, sourceDir + relativePath,
+                                    destinationDir + relativePath, maxFileSize));
             }
         }
+        terminate(start);
     }
 
     @Override
     public void unzip(String sourceDir, String destinationDir) {
+        long start = System.currentTimeMillis();
         Map<String, SortedSetMultimap<String, String>> pathToFileAndPartFiles = ZippyUtils.getAllZippedFilesWithParts(sourceDir,
                                                                             ZipFormatType.ZIP.getExtension());
-        // submit tasks to executor later
         for (Map.Entry<String, SortedSetMultimap<String, String>> entry : pathToFileAndPartFiles.entrySet()) {
             String relativePath = entry.getKey();
             for (String file : entry.getValue().keySet()) {
-                try {
-                    ZippyUtils.createOutDirsIfMissing(destinationDir + relativePath);
-                    ChunkedUnzip unzipper = new ChunkedUnzip(file, sourceDir + relativePath,
-                                                destinationDir + relativePath, Lists.newArrayList(entry.getValue().get(file)));
-                    unzipper.unzipAll();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                ZippyUtils.createOutDirsIfMissing(destinationDir + relativePath);
+                executor.execute(new ChunkedUnzip(file, sourceDir + relativePath,
+                                    destinationDir + relativePath, Lists.newArrayList(entry.getValue().get(file))));
             }
         }
+        terminate(start);
     }
+
+    private void terminate(long start) {
+        executor.shutdown();
+        try {
+            executor.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+        } catch (InterruptedException e) {
+            executor.shutdownNow();
+        } finally {
+            long finish = System.currentTimeMillis();
+            System.out.println("Elapsed Time: " + (finish - start));
+        }
+    }
+
 }

@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-public class ChunkedZip {
+public class ChunkedZip implements Runnable {
 
     private String filename;
     private String sourceDir;
@@ -31,9 +31,17 @@ public class ChunkedZip {
         this.maxFileSize = maxFileSize;
     }
 
-    public void createZip() throws IOException {
-        // handle the case of ending or not ending with '/'
-        fis = new FileInputStream(sourceDir + "/" + filename);
+    @Override
+    public void run() {
+        try {
+            createZip();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void createZip() throws IOException {
+        fis = new FileInputStream(sourceDir + ZippyUtils.DELIM + filename);
 
         int length, accumulator = 0;
         byte[] inBuffer = new byte[ZippyUtils.BUFFER_SIZE];
@@ -45,7 +53,7 @@ public class ChunkedZip {
             }
             currZipOutStream.write(inBuffer, 0, length);
             accumulator += length;
-            // log progress, based on size estimate of zip entry
+            //TODO log progress, based on size estimate of zip entry
         }
 
         fis.close();

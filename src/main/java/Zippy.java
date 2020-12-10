@@ -6,8 +6,7 @@ public class Zippy {
     private static final CompressorDecompressorFactory factory = new CompressorDecompressorFactory();
 
     public static void main(String[] args) {
-        // utility to display usage and parse-format args
-
+        //TODO utility to display usage and parse-format args
         long maxFileSizeMB = 10; //Long.valueOf(args[0]);
 
         FileCompressorDecompressor FCD = factory.initFCD(ZipFormatType.ZIP, maxFileSizeMB * 1024 * 1024);
@@ -17,5 +16,6 @@ public class Zippy {
 
         FCD.zip(sourceDir, destDir);
         FCD.unzip(destDir, sourceDir);
+
     }
 }
