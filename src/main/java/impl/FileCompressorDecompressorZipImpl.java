@@ -16,17 +16,15 @@ import java.util.concurrent.TimeUnit;
 
 public class FileCompressorDecompressorZipImpl implements FileCompressorDecompressor {
 
-    private final long maxFileSize;
     private final ExecutorService executor;
 
-    public FileCompressorDecompressorZipImpl(long maxFileSize) {
-        this.maxFileSize = maxFileSize;
-        this.executor = Executors.newFixedThreadPool(4);
+    public FileCompressorDecompressorZipImpl(int threads) {
+        this.executor = Executors.newFixedThreadPool(threads);
 
     }
 
     @Override
-    public void zip(String sourceDir, String destinationDir) {
+    public void zip(String sourceDir, String destinationDir, Integer maxFileSize) {
         long start = System.currentTimeMillis();
         Map<String, List<String>> pathToFileList = ZippyUtils.getAllFilesInDir(sourceDir);
         for (Map.Entry<String, List<String>> entry : pathToFileList.entrySet()) {
@@ -64,7 +62,7 @@ public class FileCompressorDecompressorZipImpl implements FileCompressorDecompre
             executor.shutdownNow();
         } finally {
             long finish = System.currentTimeMillis();
-            System.out.println("Elapsed Time: " + (finish - start));
+            System.out.println("Elapsed Time: " + ((float)(finish - start))/1000 + " seconds");
         }
     }
 

@@ -75,4 +75,11 @@ public class ZippyUtils {
             directory.mkdirs();
         }
     }
+
+    public static String getPathWithDelimiter(String path) {
+        if (path.endsWith(DELIM)) {
+            return path;
+        }
+        return path + DELIM;
+    }
 }

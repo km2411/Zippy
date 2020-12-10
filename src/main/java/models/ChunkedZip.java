@@ -7,6 +7,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -24,11 +26,11 @@ public class ChunkedZip implements Runnable {
 
     private static final String FILE_EXTENSION = ZipFormatType.ZIP.getExtension();
 
-    public ChunkedZip(String filename, String sourceDir, String destDir, long maxFileSize) {
+    public ChunkedZip(String filename, String sourceDir, String destDir, Integer maxFileSize) {
         this.filename = filename;
         this.sourceDir = sourceDir;
         this.destDir = destDir;
-        this.maxFileSize = maxFileSize;
+        this.maxFileSize = maxFileSize * 1024 * 1024;
     }
 
     @Override
@@ -41,24 +43,29 @@ public class ChunkedZip implements Runnable {
     }
 
     private void createZip() throws IOException {
-        fis = new FileInputStream(sourceDir + ZippyUtils.DELIM + filename);
+        String filepath = ZippyUtils.getPathWithDelimiter(sourceDir) + filename;
+        fis = new FileInputStream(filepath);
+        long filesize = Files.size(Paths.get(filepath));
 
-        int length, accumulator = 0;
+        int length;
+        long remaining = filesize, accumulator = 0;
         byte[] inBuffer = new byte[ZippyUtils.BUFFER_SIZE];
 
         while ((length = fis.read(inBuffer)) > 0) {
             if (currZipOutStream == null || (accumulator + ZippyUtils.BUFFER_SIZE >= maxFileSize)) {
                 updateCurrentZipOutStream();
+                remaining -= accumulator;
+                System.out.println("Compressing " + filename + ".. " + ((float) (filesize - remaining) * 100 / filesize) + " % done..");
                 accumulator = 0;
             }
             currZipOutStream.write(inBuffer, 0, length);
             accumulator += length;
-            //TODO log progress, based on size estimate of zip entry
         }
 
         fis.close();
         currZipOutStream.closeEntry();
         currZipOutStream.close();
+        System.out.println("Compression complete for " + filename + " 100 % done..");
     }
 
     private void updateCurrentZipOutStream() throws IOException {
@@ -66,7 +73,7 @@ public class ChunkedZip implements Runnable {
             currZipOutStream.closeEntry();
             currZipOutStream.close();
         }
-        File targetFile = new File(destDir, getFilePartName());
+        File targetFile = new File(ZippyUtils.getPathWithDelimiter(destDir), getFilePartName());
         FileOutputStream fos = new FileOutputStream(targetFile);
         currZipOutStream = new ZipOutputStream(fos);
         currZipOutStream.putNextEntry(new ZipEntry(filename));

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class ChunkedUnzip implements Runnable{
+public class ChunkedUnzip implements Runnable {
 
     private String filename;
     private String sourceDir;
@@ -36,7 +36,7 @@ public class ChunkedUnzip implements Runnable{
 
     private void unzipAll() throws IOException {
         try {
-            fos = new FileOutputStream(destDir + ZippyUtils.DELIM + filename);
+            fos = new FileOutputStream(ZippyUtils.getPathWithDelimiter(destDir) + filename);
             for (String file : partFiles) {
                 unzipSingleFile(file);
             }
@@ -44,6 +44,7 @@ public class ChunkedUnzip implements Runnable{
             e.printStackTrace();
         } finally {
             fos.close();
+            System.out.println("De-compression complete for " + filename + " 100 % done..");
         }
     }
 
@@ -51,6 +52,7 @@ public class ChunkedUnzip implements Runnable{
         try {
             ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile));
             ZipEntry zipEntry = zis.getNextEntry();
+            System.out.println("De-compressing " + filename + "..Part " + (partFiles.indexOf(partFile) + 1) + " / " + partFiles.size());
             while (zipEntry != null) {
                 int length;
                 byte buffer[] = new byte[ZippyUtils.BUFFER_SIZE];
