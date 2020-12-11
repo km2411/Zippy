@@ -1,25 +1,27 @@
-package impl;
+package com.test.agoda.impl;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.SortedSetMultimap;
-import enums.ZipFormatType;
-import interfaces.FileCompressorDecompressor;
-import models.ChunkedUnzip;
-import models.ChunkedZip;
-import utils.ZippyUtils;
+import com.test.agoda.enums.ZipFormatType;
+import com.test.agoda.interfaces.FileCompressorDecompressor;
+import com.test.agoda.models.ChunkedUnzip;
+import com.test.agoda.models.ChunkedZip;
+import com.test.agoda.utils.ZippyUtils;
 
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Logger;
 
 public class FileCompressorDecompressorZipImpl implements FileCompressorDecompressor {
 
     private final ExecutorService executor;
+    private static final Logger LOGGER = Logger.getLogger(FileCompressorDecompressorZipImpl.class.getName());
 
-    public FileCompressorDecompressorZipImpl(int threads) {
-        this.executor = Executors.newFixedThreadPool(threads);
+    public FileCompressorDecompressorZipImpl(int nThreads) {
+        this.executor = Executors.newFixedThreadPool(nThreads);
 
     }
 
@@ -62,7 +64,7 @@ public class FileCompressorDecompressorZipImpl implements FileCompressorDecompre
             executor.shutdownNow();
         } finally {
             long finish = System.currentTimeMillis();
-            System.out.println("Elapsed Time: " + ((float)(finish - start))/1000 + " seconds");
+            LOGGER.info("Elapsed Time: " + ((float)(finish - start))/1000 + " seconds");
         }
     }
 

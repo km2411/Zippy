@@ -1,4 +1,4 @@
-package enums;
+package com.test.agoda.enums;
 
 public enum ZipFormatType {
 

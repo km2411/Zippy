@@ -1,11 +1,13 @@
-package models;
+package com.test.agoda.models;
 
-import utils.ZippyUtils;
+import com.test.agoda.utils.ZippyUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -17,6 +19,7 @@ public class ChunkedUnzip implements Runnable {
     private List<String> partFiles;
 
     private FileOutputStream fos;
+    private static final Logger LOGGER = Logger.getLogger(ChunkedUnzip.class.getName());
 
     public ChunkedUnzip(String filename, String sourceDir, String destDir, List<String> partFiles) {
         this.filename = filename;
@@ -30,7 +33,7 @@ public class ChunkedUnzip implements Runnable {
         try {
             unzipAll();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.toString());
         }
     }
 
@@ -41,18 +44,17 @@ public class ChunkedUnzip implements Runnable {
                 unzipSingleFile(file);
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.toString());
         } finally {
             fos.close();
-            System.out.println("De-compression complete for " + filename + " 100 % done..");
+            LOGGER.info("De-compression complete for " + filename + " 100 % done..");
         }
     }
 
     private void unzipSingleFile(String partFile) {
-        try {
-            ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile));
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile))) {
             ZipEntry zipEntry = zis.getNextEntry();
-            System.out.println("De-compressing " + filename + "..Part " + (partFiles.indexOf(partFile) + 1) + " / " + partFiles.size());
+            LOGGER.info("De-compressing " + filename + "..Part " + (partFiles.indexOf(partFile) + 1) + " / " + partFiles.size());
             while (zipEntry != null) {
                 int length;
                 byte buffer[] = new byte[ZippyUtils.BUFFER_SIZE];
@@ -63,7 +65,7 @@ public class ChunkedUnzip implements Runnable {
                 zipEntry = zis.getNextEntry();
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, e.toString());
         }
     }
 }

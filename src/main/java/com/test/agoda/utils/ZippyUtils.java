@@ -1,4 +1,4 @@
-package utils;
+package com.test.agoda.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -6,10 +6,14 @@ import com.google.common.collect.SortedSetMultimap;
 import com.google.common.collect.TreeMultimap;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class ZippyUtils {
 
@@ -17,25 +21,39 @@ public class ZippyUtils {
     public static final String PART_POSTFIX = ".part.";
     public static final String DELIM = "/";
 
+    private ZippyUtils() {
+        throw new IllegalStateException("Can't instantiate a utility class");
+    }
+
     public static Map<String, List<String>> getAllFilesInDir(String sourceDir) {
         Map<String, List<String>> pathToFileList = Maps.newHashMap();
-        File directory = new File(sourceDir);
-        walk(sourceDir, directory, pathToFileList);
+        walk(sourceDir, Paths.get(sourceDir), pathToFileList);
         return pathToFileList;
     }
 
-    private static void walk(String sourceDir, File directory, Map<String, List<String>> pathToFileList) {
+    private static void walk(String sourceDir, Path currDirectory, Map<String, List<String>> pathToFileList) {
         List<String> filesOnPath = Lists.newArrayList();
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
+        List<Path> files = getFilesInDir(currDirectory, true);
+        for (Path file : files) {
+            if (Files.isDirectory(file)) {
                 walk(sourceDir, file, pathToFileList);
             } else {
-                filesOnPath.add(file.getName());
+                filesOnPath.add(currDirectory.relativize(file).toString());
             }
         }
         Path base = Paths.get(sourceDir);
-        Path curDir = Paths.get(directory.getAbsolutePath());
-        pathToFileList.put(base.relativize(curDir).toString(), filesOnPath);
+        pathToFileList.put(base.relativize(currDirectory).toString(), filesOnPath);
+    }
+
+    public static List<Path> getFilesInDir(Path currDir, boolean considerSubDirs) {
+        // walk includes current path as well in the output
+        try (Stream<Path> files = Files.walk(currDir)) {
+            return files.filter(f -> !f.equals(currDir) && (!Files.isDirectory(f) || considerSubDirs))
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return Lists.newArrayList();
     }
 
     public static Map<String, SortedSetMultimap<String, String>> getAllZippedFilesWithParts(String sourceDir, String extension) {
@@ -59,7 +77,7 @@ public class ZippyUtils {
         return fileToParts;
     }
 
-    private static String getPrefix(String file) {
+    public static String getPrefix(String file) {
         String[] parts = file.split("\\.");
         int len = parts.length - 3;
         String key = parts[0];

@@ -1,4 +1,4 @@
-package interfaces;
+package com.test.agoda.interfaces;
 
 public interface FileCompressorDecompressor {
 

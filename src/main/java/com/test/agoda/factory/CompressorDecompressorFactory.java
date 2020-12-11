@@ -1,8 +1,8 @@
-package factory;
+package com.test.agoda.factory;
 
-import enums.ZipFormatType;
-import impl.FileCompressorDecompressorZipImpl;
-import interfaces.FileCompressorDecompressor;
+import com.test.agoda.enums.ZipFormatType;
+import com.test.agoda.impl.FileCompressorDecompressorZipImpl;
+import com.test.agoda.interfaces.FileCompressorDecompressor;
 
 public class CompressorDecompressorFactory {
 

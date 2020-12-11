@@ -1,8 +1,10 @@
+package com.test.agoda;
+
 import com.google.common.collect.Maps;
-import enums.ZipFormatType;
-import factory.CompressorDecompressorFactory;
-import interfaces.FileCompressorDecompressor;
-import utils.ZippyUtils;
+import com.test.agoda.enums.ZipFormatType;
+import com.test.agoda.factory.CompressorDecompressorFactory;
+import com.test.agoda.interfaces.FileCompressorDecompressor;
+import com.test.agoda.utils.ZippyUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -20,9 +22,9 @@ public class Zippy {
         if (len == 0) {
             System.out.println("No input argument provided");
             printUsage();
-            exit(0);
         }
-        String mode = args[0], sourceDir, destDir;
+        String mode = args[0];
+        String sourceDir, destDir;
         FileCompressorDecompressor FCD = factory.initFCD(ZipFormatType.ZIP, config.get("ThreadCount"));
 
         switch (mode.toLowerCase()) {
@@ -51,16 +53,14 @@ public class Zippy {
                 break;
             default:
                 printUsage();
-                exit(0);
+                exit(1);
         }
     }
 
     private static Map<String, Integer> loadConfig() {
         Map<String, Integer> configs = Maps.newHashMap();
         Properties properties = new Properties();
-        FileInputStream fis = null;
-        try {
-            fis = new FileInputStream("config.properties");
+        try (FileInputStream fis = new FileInputStream("config.properties")) {
             properties.load(fis);
             configs.put("ThreadCount", Integer.parseInt(String.valueOf(properties.get("ThreadCount"))));
             configs.put("DefaultFileSize", Integer.parseInt(String.valueOf(properties.get("DefaultFileSize"))));
@@ -77,5 +77,6 @@ public class Zippy {
         System.out.println("Usage: ");
         System.out.println("Compress : -c input_dir output_dir max_file_size[MB]");
         System.out.println("Decompress : -d input_dir output_dir");
+        exit(0);
     }
 }
