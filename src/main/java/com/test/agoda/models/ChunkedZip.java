@@ -9,6 +9,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -54,33 +55,38 @@ public class ChunkedZip implements Runnable {
         long remaining = filesize;
         long accumulator = 0;
         byte[] inBuffer = new byte[ZippyUtils.BUFFER_SIZE];
+        updateCurrentZipOutStream();
 
         while ((length = fis.read(inBuffer)) > 0) {
-            if (currZipOutStream == null || (accumulator + ZippyUtils.BUFFER_SIZE >= maxFileSize)) {
+            if (accumulator >= (maxFileSize - new Random().nextInt(ZippyUtils.BUFFER_SIZE))) {
                 updateCurrentZipOutStream();
                 remaining -= accumulator;
-                LOGGER.info("Compressing " + filename + ".. " + ((float) (filesize - remaining) * 100 / filesize) + " % done..");
                 accumulator = 0;
+                LOGGER.info("Compressing " + filename + ".. " + ((float) (filesize - remaining) * 100 / filesize) + " % done..");
             }
             currZipOutStream.write(inBuffer, 0, length);
             accumulator += length;
         }
 
+        closeZipOutStream();
         fis.close();
-        currZipOutStream.closeEntry();
-        currZipOutStream.close();
         LOGGER.info("Compression complete for " + filename + " 100 % done..");
     }
 
     private void updateCurrentZipOutStream() throws IOException {
         if (currZipOutStream != null) {
-            currZipOutStream.closeEntry();
-            currZipOutStream.close();
+            closeZipOutStream();
         }
         File targetFile = new File(ZippyUtils.getPathWithDelimiter(destDir), getFilePartName());
         FileOutputStream fos = new FileOutputStream(targetFile);
         currZipOutStream = new ZipOutputStream(fos);
         currZipOutStream.putNextEntry(new ZipEntry(filename));
+    }
+
+    private void closeZipOutStream() throws IOException {
+        currZipOutStream.flush();
+        currZipOutStream.closeEntry();
+        currZipOutStream.close();
     }
 
     private String getFilePartName() {

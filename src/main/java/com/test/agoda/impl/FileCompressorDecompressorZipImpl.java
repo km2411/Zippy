@@ -1,6 +1,5 @@
 package com.test.agoda.impl;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.SortedSetMultimap;
 import com.test.agoda.enums.ZipFormatType;
 import com.test.agoda.interfaces.FileCompressorDecompressor;
@@ -22,7 +21,6 @@ public class FileCompressorDecompressorZipImpl implements FileCompressorDecompre
 
     public FileCompressorDecompressorZipImpl(int nThreads) {
         this.executor = Executors.newFixedThreadPool(nThreads);
-
     }
 
     @Override
@@ -50,7 +48,7 @@ public class FileCompressorDecompressorZipImpl implements FileCompressorDecompre
             for (String file : entry.getValue().keySet()) {
                 ZippyUtils.createOutDirsIfMissing(destinationDir + relativePath);
                 executor.execute(new ChunkedUnzip(file, sourceDir + relativePath,
-                                    destinationDir + relativePath, Lists.newArrayList(entry.getValue().get(file))));
+                                    destinationDir + relativePath, entry.getValue().get(file)));
             }
         }
         terminate(start);
@@ -63,8 +61,9 @@ public class FileCompressorDecompressorZipImpl implements FileCompressorDecompre
         } catch (InterruptedException e) {
             executor.shutdownNow();
         } finally {
+            executor.shutdownNow();
             long finish = System.currentTimeMillis();
-            LOGGER.info("Elapsed Time: " + ((float)(finish - start))/1000 + " seconds");
+            LOGGER.info("Elapsed Time: " + ((float) (finish - start)) / 1000 + " seconds");
         }
     }
 

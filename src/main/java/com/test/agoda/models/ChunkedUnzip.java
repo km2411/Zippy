@@ -5,7 +5,7 @@ import com.test.agoda.utils.ZippyUtils;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.List;
+import java.util.SortedSet;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -16,12 +16,12 @@ public class ChunkedUnzip implements Runnable {
     private String filename;
     private String sourceDir;
     private String destDir;
-    private List<String> partFiles;
+    private SortedSet<String> partFiles;
 
     private FileOutputStream fos;
     private static final Logger LOGGER = Logger.getLogger(ChunkedUnzip.class.getName());
 
-    public ChunkedUnzip(String filename, String sourceDir, String destDir, List<String> partFiles) {
+    public ChunkedUnzip(String filename, String sourceDir, String destDir, SortedSet<String> partFiles) {
         this.filename = filename;
         this.sourceDir = sourceDir;
         this.destDir = destDir;
@@ -46,6 +46,7 @@ public class ChunkedUnzip implements Runnable {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e.toString());
         } finally {
+            fos.flush();
             fos.close();
             LOGGER.info("De-compression complete for " + filename + " 100 % done..");
         }
@@ -54,7 +55,7 @@ public class ChunkedUnzip implements Runnable {
     private void unzipSingleFile(String partFile) {
         try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile))) {
             ZipEntry zipEntry = zis.getNextEntry();
-            LOGGER.info("De-compressing " + filename + "..Part " + (partFiles.indexOf(partFile) + 1) + " / " + partFiles.size());
+            LOGGER.info("De-compressing " + filename + "..Part " + (partFiles.headSet(partFile).size() + 1) + " / " + partFiles.size());
             while (zipEntry != null) {
                 int length;
                 byte buffer[] = new byte[ZippyUtils.BUFFER_SIZE];

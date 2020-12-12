@@ -53,7 +53,6 @@ public class Zippy {
                 break;
             default:
                 printUsage();
-                exit(1);
         }
     }
 
@@ -77,6 +76,6 @@ public class Zippy {
         System.out.println("Usage: ");
         System.out.println("Compress : -c input_dir output_dir max_file_size[MB]");
         System.out.println("Decompress : -d input_dir output_dir");
-        exit(0);
+        exit(1);
     }
 }
