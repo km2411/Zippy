@@ -1,9 +1,12 @@
-package com.test.agoda.factory;
+package com.test.factory;
 
-import com.test.agoda.enums.ZipFormatType;
-import com.test.agoda.impl.FileCompressorDecompressorZipImpl;
-import com.test.agoda.interfaces.FileCompressorDecompressor;
+import com.test.enums.ZipFormatType;
+import com.test.impl.FileCompressorDecompressorZipImpl;
+import com.test.interfaces.FileCompressorDecompressor;
 
+/**
+ * Factory that provides required compression-decompression algorithm's implementation
+ */
 public class CompressorDecompressorFactory {
 
     public FileCompressorDecompressor initFCD(ZipFormatType type, Integer threadCount) {

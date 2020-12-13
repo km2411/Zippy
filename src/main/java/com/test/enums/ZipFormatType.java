@@ -1,5 +1,8 @@
-package com.test.agoda.enums;
+package com.test.enums;
 
+/**
+ * Enum to denote different compression types
+ */
 public enum ZipFormatType {
 
     ZIP(".zip");

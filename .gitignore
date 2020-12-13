@@ -3,3 +3,7 @@
 /target/*
 /TestFiles/*
 /TestOut/*
+.settings/*
+.project
+.classpath
+dependency-reduced-pom.xml

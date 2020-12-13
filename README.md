@@ -1,7 +1,3 @@
-## Hello Agoda :)
-
-Here's my submission for a simple file compression-decompression utility.
-
 ## Zippy
 
 * A utility that compresses files and folders into a set of compressed files such that each compressed file doesn't

@@ -1,6 +1,6 @@
-package com.test.agoda.impl;
+package com.test.impl;
 
-import com.test.agoda.utils.ZippyUtils;
+import com.test.utils.ZippyUtils;
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.test.agoda.impl.helpers.TestHelper.*;
+import static com.test.impl.helpers.TestHelper.*;
 
 public class FileCompressorDecompressorZipImplTest {
 
@@ -48,7 +48,7 @@ public class FileCompressorDecompressorZipImplTest {
 
         writeDummyData(testFile.toString(), size);
         FileCompressorDecompressorZipImpl fcd = new FileCompressorDecompressorZipImpl(1);
-        fcd.zip(tempSourceDir.toString(), tempDestDir.toString(), Integer.valueOf(maxSize));
+        fcd.compress(tempSourceDir.toString(), tempDestDir.toString(), Integer.valueOf(maxSize));
 
         List<Path> filesInDestDir = ZippyUtils.getFilesInDir(tempDestDir, false);
 
@@ -71,7 +71,7 @@ public class FileCompressorDecompressorZipImplTest {
     @Test(priority = 2)
     public void testUnzip() {
         FileCompressorDecompressorZipImpl fcd = new FileCompressorDecompressorZipImpl(1);
-        fcd.unzip(tempDestDir.toString(), tempOutDir.toString());
+        fcd.decompress(tempDestDir.toString(), tempOutDir.toString());
 
         List<Path> filesInDestDir = ZippyUtils.getFilesInDir(tempOutDir, false);
 
