@@ -1,7 +1,7 @@
-package com.test.agoda.models;
+package com.test.services;
 
-import com.test.agoda.enums.ZipFormatType;
-import com.test.agoda.utils.ZippyUtils;
+import com.test.enums.ZipFormatType;
+import com.test.utils.ZippyUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -30,6 +30,14 @@ public class ChunkedZip implements Runnable {
     private static final String FILE_EXTENSION = ZipFormatType.ZIP.getExtension();
     private static final Logger LOGGER = Logger.getLogger(ChunkedZip.class.getName());
 
+    /**
+     * This class compresses a file to create .zip files
+     *
+     * @param filename    - name of the file to be compressed
+     * @param sourceDir   - source path for files to be compressed
+     * @param destDir     - destination path for compressed (.zip) files
+     * @param maxFileSize - maximum file size limit for a compressed file
+     */
     public ChunkedZip(String filename, String sourceDir, String destDir, Integer maxFileSize) {
         this.filename = filename;
         this.sourceDir = sourceDir;

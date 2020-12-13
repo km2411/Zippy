@@ -1,6 +1,6 @@
-package com.test.agoda.impl.helpers;
+package com.test.impl.helpers;
 
-import com.test.agoda.utils.ZippyUtils;
+import com.test.utils.ZippyUtils;
 import org.testng.collections.Sets;
 
 import java.io.BufferedInputStream;

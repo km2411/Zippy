@@ -1,10 +1,10 @@
-package com.test.agoda;
+package com.test;
 
 import com.google.common.collect.Maps;
-import com.test.agoda.enums.ZipFormatType;
-import com.test.agoda.factory.CompressorDecompressorFactory;
-import com.test.agoda.interfaces.FileCompressorDecompressor;
-import com.test.agoda.utils.ZippyUtils;
+import com.test.enums.ZipFormatType;
+import com.test.factory.CompressorDecompressorFactory;
+import com.test.interfaces.FileCompressorDecompressor;
+import com.test.utils.ZippyUtils;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -13,6 +13,10 @@ import java.util.Properties;
 
 import static java.lang.System.exit;
 
+/**
+ * This is the main class, responsible for parsing cli arguments
+ * and calling applicable function - compress/ de-compress
+ */
 public class Zippy {
     private static final CompressorDecompressorFactory factory = new CompressorDecompressorFactory();
 
@@ -40,7 +44,7 @@ public class Zippy {
                     maxSize = config.get("DefaultFileSize");
                     System.out.println("Using default maxFileSize = " + maxSize);
                 }
-                FCD.zip(sourceDir, destDir, maxSize);
+                FCD.compress(sourceDir, destDir, maxSize);
                 break;
             case "-d":
                 if (len < 3 || len > 3) {
@@ -49,7 +53,7 @@ public class Zippy {
                 }
                 sourceDir = ZippyUtils.getPathWithDelimiter(args[1]);
                 destDir = ZippyUtils.getPathWithDelimiter(args[2]);
-                FCD.unzip(sourceDir, destDir);
+                FCD.decompress(sourceDir, destDir);
                 break;
             default:
                 printUsage();

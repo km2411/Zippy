@@ -1,6 +1,6 @@
-package com.test.agoda.models;
+package com.test.services;
 
-import com.test.agoda.utils.ZippyUtils;
+import com.test.utils.ZippyUtils;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -21,6 +21,14 @@ public class ChunkedUnzip implements Runnable {
     private FileOutputStream fos;
     private static final Logger LOGGER = Logger.getLogger(ChunkedUnzip.class.getName());
 
+    /**
+     * This class de-compresses .zip files to retrieve original file
+     *
+     * @param filename  - name of the original file, before compression
+     * @param sourceDir - source path for .zip files to be de-compressed
+     * @param destDir   - destination path for unzipped files.
+     * @param partFiles - sorted set of .zip files created after compression
+     */
     public ChunkedUnzip(String filename, String sourceDir, String destDir, SortedSet<String> partFiles) {
         this.filename = filename;
         this.sourceDir = sourceDir;
@@ -53,7 +61,7 @@ public class ChunkedUnzip implements Runnable {
     }
 
     private void unzipSingleFile(String partFile) {
-        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIM + partFile))) {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(sourceDir + ZippyUtils.DELIMITER + partFile))) {
             ZipEntry zipEntry = zis.getNextEntry();
             LOGGER.info("De-compressing " + filename + "..Part " + (partFiles.headSet(partFile).size() + 1) + " / " + partFiles.size());
             while (zipEntry != null) {

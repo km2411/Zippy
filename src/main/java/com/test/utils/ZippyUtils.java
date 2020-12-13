@@ -1,4 +1,4 @@
-package com.test.agoda.utils;
+package com.test.utils;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -19,12 +19,18 @@ public class ZippyUtils {
 
     public static final int BUFFER_SIZE = 1024;
     public static final String PART_POSTFIX = ".part.";
-    public static final String DELIM = "/";
+    public static final String DELIMITER = "/";
 
     private ZippyUtils() {
         throw new IllegalStateException("Can't instantiate a utility class");
     }
 
+    /**
+     * Methods to get all files in a directory and sub-dirs with relative path
+     *
+     * @param sourceDir - base directory
+     * @return map of path of a directory (relative to sourceDir) to list of files present in the directory
+     */
     public static Map<String, List<String>> getAllFilesInDir(String sourceDir) {
         Map<String, List<String>> pathToFileList = Maps.newHashMap();
         walk(sourceDir, Paths.get(sourceDir), pathToFileList);
@@ -45,6 +51,13 @@ public class ZippyUtils {
         pathToFileList.put(base.relativize(currDirectory).toString(), filesOnPath);
     }
 
+    /**
+     * Method to get all files in a directory
+     *
+     * @param currDir         - where to search for files
+     * @param considerSubDirs - whether to consider sub-directories as file in the output or not
+     * @return list of
+     */
     public static List<Path> getFilesInDir(Path currDir, boolean considerSubDirs) {
         // walk includes current path as well in the output
         try (Stream<Path> files = Files.walk(currDir)) {
@@ -56,6 +69,15 @@ public class ZippyUtils {
         return Lists.newArrayList();
     }
 
+    /**
+     * Method to get a sorted set of .zip part files corresponding to a single original file
+     * present a directory and sub-directories
+     *
+     * @param sourceDir - base directory
+     * @param extension - the file-extension to be considered when selecting files
+     * @return map of path of a directory (relative to sourceDir) to a
+     * map of original filename to sorted set of .zip part files corresponding to it.
+     */
     public static Map<String, SortedSetMultimap<String, String>> getAllZippedFilesWithParts(String sourceDir, String extension) {
         // check files with extension
         Map<String, SortedSetMultimap<String, String>> allZippedWithParts = Maps.newHashMap();
@@ -77,6 +99,12 @@ public class ZippyUtils {
         return fileToParts;
     }
 
+    /**
+     * To get the name of original file w/o the part name and extension, only prefix
+     *
+     * @param file - name of a .zip part file
+     * @return String - original file's name
+     */
     public static String getPrefix(String file) {
         String[] parts = file.split("\\.");
         int len = parts.length - 3;
@@ -95,9 +123,9 @@ public class ZippyUtils {
     }
 
     public static String getPathWithDelimiter(String path) {
-        if (path.endsWith(DELIM)) {
+        if (path.endsWith(DELIMITER)) {
             return path;
         }
-        return path + DELIM;
+        return path + DELIMITER;
     }
 }
